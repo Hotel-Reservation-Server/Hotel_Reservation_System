@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Hotel_Reservation_System.Data;
 using Hotel_Reservation_System.Models;
 using Hotel_Reservation_System.Dto;
+using Hotel_Reservation_System.Password;
+using Hotel_Reservation_System.Password_and_Email;
 
 namespace Hotel_Reservation_System.Controllers
 {
@@ -54,9 +56,6 @@ namespace Hotel_Reservation_System.Controllers
             {
                 return NotFound("User not found.");
             }
-
-           
-
             // Map to DTO (to avoid exposing sensitive info)
             var userDto = new UserDto
             {
@@ -80,24 +79,23 @@ namespace Hotel_Reservation_System.Controllers
             {
                 return Problem("Entity set 'ApplicationDBContext.Users'  is null.");
             }
+
+            PasswordValidator validator = new PasswordValidator();
+            EmailValidation emailValidation = new EmailValidation();
+            // Validate the password strength
+            if (!validator.IsPasswordStrong(user.Password))
+            {
+                return BadRequest("Password must be at least 8 characters long, and contain an uppercase letter, a lowercase letter, a number, and a special character.");
+            }
+            if (!emailValidation.IsValidEmail(user.Email))
+            {
+                return BadRequest("Not a valid Email address");
+            }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetUserByEmailAndPassword), new { email = user.Email, password = user.Password }, user);
         }
-
-
-        /* public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-          {
-              if (_context.Users == null)
-              {
-                  return NotFound();
-              }
-              return await _context.Users.ToListAsync();
-          }*/
-
-
-
 
 
     }
