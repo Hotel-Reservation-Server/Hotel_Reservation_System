@@ -1,4 +1,5 @@
 using Hotel_Reservation_System.Data;
+using Hotel_Reservation_System.PasswordHarshing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -12,6 +13,7 @@ namespace Hotel_Reservation_System
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

@@ -9,8 +9,9 @@ namespace Hotel_Reservation_System.Password_and_Email
         {
             string[] tlds = { "com", "org", "net", "edu" };
 
-          
 
+
+            //string emailPattern = "/ ^\w + ([\.-] ?\w +)@\w + ([\.-] ?\w +)(\.\w{ 2,3})+$/";
             string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
             if (!Regex.IsMatch(emailAddress, emailPattern))
             {
@@ -22,7 +23,7 @@ namespace Hotel_Reservation_System.Password_and_Email
            
 
             // Check if the email address has a valid MX record
-            using (var client = new System.Net.Mail.SmtpClient())
+         /*   using (var client = new System.Net.Mail.SmtpClient())
             {
                 try
                 {
@@ -34,7 +35,7 @@ namespace Hotel_Reservation_System.Password_and_Email
                     Console.WriteLine($"Email validation failed: {ex.Message}");
                     return false;
                 }
-           }
+           }*/
                 return true;
         }
     }

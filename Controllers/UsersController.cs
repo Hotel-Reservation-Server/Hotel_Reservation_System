@@ -10,6 +10,7 @@ using Hotel_Reservation_System.Models;
 using Hotel_Reservation_System.Dto;
 using Hotel_Reservation_System.Password;
 using Hotel_Reservation_System.Password_and_Email;
+using Hotel_Reservation_System.PasswordHarshing;
 
 namespace Hotel_Reservation_System.Controllers
 {
@@ -19,10 +20,12 @@ namespace Hotel_Reservation_System.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context, IPasswordHasher passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         // GET: Users
@@ -51,10 +54,14 @@ namespace Hotel_Reservation_System.Controllers
         {
             // Find user by email
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-
+            var result = _passwordHasher.verify(user.Password, password);
             if (user == null)
             {
                 return NotFound("User not found.");
+            }
+            if(!result)
+            {
+                throw new Exception("Username or Password is not correct");
             }
             // Map to DTO (to avoid exposing sensitive info)
             var userDto = new UserDto
@@ -73,8 +80,9 @@ namespace Hotel_Reservation_System.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(User user)
         {
+            var passwordHasherstring = _passwordHasher.Hash(user.Password);
             if (_context.Users == null)
             {
                 return Problem("Entity set 'ApplicationDBContext.Users'  is null.");
@@ -87,14 +95,35 @@ namespace Hotel_Reservation_System.Controllers
             {
                 return BadRequest("Password must be at least 8 characters long, and contain an uppercase letter, a lowercase letter, a number, and a special character.");
             }
+            // Validate Email
             if (!emailValidation.IsValidEmail(user.Email))
             {
                 return BadRequest("Not a valid Email address");
             }
-            _context.Users.Add(user);
+            var newuser = new User
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Password = passwordHasherstring,
+                Email = user.Email,
+                NIN = user.NIN,
+                Gender = user.Gender,
+                PhoneNo = user.PhoneNo,
+                StateofResidence = user.StateofResidence
+            };
+            _context.Users.Add(newuser);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUserByEmailAndPassword), new { email = user.Email, password = user.Password }, user);
+            return new UserDto
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                NIN = user.NIN,
+                Gender = user.Gender,
+                PhoneNo = user.PhoneNo,
+                StateofResidence = user.StateofResidence
+            };
         }
 
 
