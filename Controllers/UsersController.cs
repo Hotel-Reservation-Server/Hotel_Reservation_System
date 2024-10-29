@@ -118,6 +118,7 @@ namespace Hotel_Reservation_System.Controllers
             // Map to DTO
             return new UserDto
             {
+                
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,

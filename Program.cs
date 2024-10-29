@@ -14,6 +14,7 @@ namespace Hotel_Reservation_System
             // Add services to the container.
             builder.Services.AddDbContext<UserDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddDbContext<RoomDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddDbContext<BookingDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

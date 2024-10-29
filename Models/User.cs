@@ -6,6 +6,7 @@ namespace Hotel_Reservation_System.Models
     [Table("User")]
     public class User
     {
+        public int UserId { get; set; }
         [Required]
         public string? FirstName { get; set; }
         [Required]

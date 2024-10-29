@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hotel_Reservation_System.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20241007160708_InitialDatabase")]
-    partial class InitialDatabase
+    [Migration("20241029034857_hotel_reservationDatabase")]
+    partial class hotel_reservationDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,31 +23,6 @@ namespace Hotel_Reservation_System.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseSerialColumns(modelBuilder);
-
-            modelBuilder.Entity("Hotel_Reservation_System.Models.Admin", b =>
-                {
-                    b.Property<int>("IdNumber")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("IdNumber"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("IdNumber");
-
-                    b.ToTable("Admin");
-                });
 
             modelBuilder.Entity("Hotel_Reservation_System.Models.User", b =>
                 {
@@ -81,6 +56,9 @@ namespace Hotel_Reservation_System.Migrations
 
                     b.Property<string>("StateofResidence")
                         .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("NIN");
 

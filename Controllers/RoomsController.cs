@@ -55,7 +55,7 @@ namespace Hotel_Reservation_System.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRoom(int id, Room room)
         {
-            if (id != room.Id)
+            if (id != room.RoomId)
             {
                 return BadRequest();
             }
@@ -92,7 +92,7 @@ namespace Hotel_Reservation_System.Controllers
           }
             var newroom = new Room 
             {
-              Id = room.Id,
+              RoomId = room.RoomId,
               Type = room.Type,
               Price = room.Price,
               IsAvailable = room.IsAvailable,
@@ -104,7 +104,7 @@ namespace Hotel_Reservation_System.Controllers
 
             return new Room
             {
-                Id = room.Id,
+                RoomId = room.RoomId,
                 Type = room.Type,
                 Price = room.Price,
                 IsAvailable = room.IsAvailable,
@@ -134,7 +134,7 @@ namespace Hotel_Reservation_System.Controllers
 
         private bool RoomExists(int id)
         {
-            return (_context.Rooms?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Rooms?.Any(e => e.RoomId == id)).GetValueOrDefault();
         }
     }
 }

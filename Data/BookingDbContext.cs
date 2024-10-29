@@ -3,14 +3,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Reservation_System.Data
 {
-    public class UserDbContext:DbContext
+    public class BookingDbContext:DbContext
     {
-        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
+        public BookingDbContext(DbContextOptions<BookingDbContext> options) : base(options) 
+        {
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.UseSerialColumns();
         }
-        public DbSet<User> Users
+        public DbSet<Booking> Bookings
         {
             get;
             set;
