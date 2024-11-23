@@ -20,6 +20,7 @@ namespace Hotel_Reservation_System.Migrations.BookingDb
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     RoomId = table.Column<int>(type: "integer", nullable: false),
+                    TotalPayment = table.Column<decimal>(type: "numeric", nullable: false),
                     CheckInDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CheckOutDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false)

@@ -1,18 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Hotel_Reservation_System.Models
+﻿namespace Hotel_Reservation_System.Dto
 {
-    public class Booking
+    public class BookingDto
     {
-        [Key]
         public int Id { get; set; }
         public int UserId { get; set; }
         public int RoomId { get; set; }
         public decimal TotalPayment { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
-        public string Status { get; set; }
     }
 }
-
- 

@@ -17,5 +17,10 @@ namespace Hotel_Reservation_System.Data
             get;
             set;
         }
+        public DbSet<Room> Rooms
+        {
+            get;
+            set;
+        }
     }
 }

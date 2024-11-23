@@ -23,11 +23,11 @@ namespace Hotel_Reservation_System.Migrations
 
             modelBuilder.Entity("Hotel_Reservation_System.Models.User", b =>
                 {
-                    b.Property<int>("NIN")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("NIN"));
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -44,20 +44,20 @@ namespace Hotel_Reservation_System.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("NIN")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PhoneNo")
-                        .HasColumnType("integer");
+                    b.Property<long>("PhoneNo")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("StateofResidence")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("NIN");
+                    b.HasKey("UserId");
 
                     b.ToTable("User");
                 });

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hotel_Reservation_System.Data;
 using Hotel_Reservation_System.Models;
+using Hotel_Reservation_System.Dto;
+using System.Security.Claims;
 
 namespace Hotel_Reservation_System.Controllers
 {
@@ -25,14 +27,21 @@ namespace Hotel_Reservation_System.Controllers
         
         // GET: api/Bookings
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Booking>>> GetBookings()
+        public IQueryable<BookingDto> Getuser()
         {
-          if (_context.Bookings == null)
-          {
-              return NotFound();
-          }
-            return await _context.Bookings.ToListAsync();
+            var getbooking = from booking in _context.Bookings
+                          select new BookingDto()
+                          {
+                              Id = booking.Id,
+                              UserId = booking.UserId,
+                              RoomId = booking.RoomId,
+                              CheckInDate = booking.CheckInDate,
+                              CheckOutDate = booking.CheckOutDate
+                          };
+
+            return getbooking;
         }
+
 
         // GET: api/Bookings/5
         [HttpGet("{id}")]
@@ -52,75 +61,53 @@ namespace Hotel_Reservation_System.Controllers
             return booking;
         }
 
-        // PUT: api/Bookings/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutBooking(int id, Booking booking)
-        {
-            if (id != booking.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(booking).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BookingExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Bookings
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
         [HttpPost]
-        public async Task<ActionResult<Booking>> PostBooking(Booking booking)
-        {
-          if (_context.Bookings == null)
-          {
-              return Problem("Entity set 'BookingDbContext.Bookings'  is null.");
-          }
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetBooking", new { id = booking.Id }, booking);
-        }
-
-        // DELETE: api/Bookings/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBooking(int id)
+        public IActionResult CreateBooking(BookingDto bookingDto)
         {
             if (_context.Bookings == null)
             {
-                return NotFound();
+                return Problem("Entity set 'BookingDbContext.Bookings' is null.");
             }
-            var booking = await _context.Bookings.FindAsync(id);
+            var room = _context.Rooms.FirstOrDefault(r => r.RoomId == bookingDto.RoomId);
+            if (room == null)
+                return BadRequest("Invalid Room ID.");
+            var nights = (bookingDto.CheckOutDate - bookingDto.CheckInDate).Days;
+            if (nights <= 0)
+                return BadRequest("Check-out date must be after check-in date.");
+
+            // Calculate total payment
+            var totalPayment = room.Price * nights;
+
+            var booking = new Booking
+            {
+                UserId = bookingDto.UserId,
+                RoomId = bookingDto.RoomId,
+                TotalPayment = totalPayment,
+                CheckInDate = bookingDto.CheckInDate,
+                CheckOutDate = bookingDto.CheckOutDate,
+            };
+            return Ok(new
+            {
+                Message = "Booking created successfully",
+                Id = booking.Id,
+                TotalPayment = booking.TotalPayment
+            });
+        }
+        [HttpDelete]
+        public IActionResult DeleteUser(int Id)
+        {
+            var booking = _context.Bookings.Find(Id);
             if (booking == null)
             {
                 return NotFound();
             }
 
             _context.Bookings.Remove(booking);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
-            return NoContent();
+            return Ok();
         }
 
-        private bool BookingExists(int id)
-        {
-            return (_context.Bookings?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
     }
 }

@@ -11,8 +11,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hotel_Reservation_System.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20241029034857_hotel_reservationDatabase")]
-    partial class hotel_reservationDatabase
+    [Migration("20241113122425_new_migration")]
+    partial class new_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,11 +26,11 @@ namespace Hotel_Reservation_System.Migrations
 
             modelBuilder.Entity("Hotel_Reservation_System.Models.User", b =>
                 {
-                    b.Property<int>("NIN")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("NIN"));
+                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -47,20 +47,20 @@ namespace Hotel_Reservation_System.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<long>("NIN")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PhoneNo")
-                        .HasColumnType("integer");
+                    b.Property<long>("PhoneNo")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("StateofResidence")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("NIN");
+                    b.HasKey("UserId");
 
                     b.ToTable("User");
                 });

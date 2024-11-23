@@ -33,24 +33,26 @@ namespace Hotel_Reservation_System.Controllers
 
 
         [HttpGet]
-        public IQueryable<UserDto> GetUserdto()
+        public IQueryable <GetUserDto> Getuser()
         {
-            var user = from b in _context.Users
-                       select new UserDto()
-                       {
-                           FirstName = b.FirstName,
-                           LastName = b.LastName,
-                           Email = b.Email,
-                           NIN = b.NIN,
-                           Gender = b.Gender,
-                           PhoneNo = b.PhoneNo,
-                           StateofResidence = b.StateofResidence
-                       };
+            var getuser = from user in _context.Users
+                          select new GetUserDto()
+            {
+                UserId = user.UserId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                NIN = user.NIN,
+                Gender = user.Gender,
+                PhoneNo = user.PhoneNo,
+                StateofResidence = user.StateofResidence
+                // Do not return sensitive information like the password
+            };
 
-            return user;
+            return getuser;
         }
 
-        [HttpGet("GetUserByEmailAndPassword")]
+            [HttpGet("GetUserByEmailAndPassword")]
         public async Task<ActionResult<UserDto>> GetUserByEmailAndPassword(string email, string password)
         {
             // Find user by email
@@ -81,9 +83,9 @@ namespace Hotel_Reservation_System.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserDto>> PostUser(User user)
+        public IActionResult PostUser(UserDto userDto) 
         {
-            var passwordHasherstring = _passwordHasher.Hash(user.Password);
+            var passwordHasherstring = _passwordHasher.Hash(userDto.Password);
             if (_context.Users == null)
             {
                 return Problem("Entity set 'ApplicationDBContext.Users'  is null.");
@@ -92,124 +94,106 @@ namespace Hotel_Reservation_System.Controllers
             PasswordValidator passwordvalidator = new PasswordValidator();
             EmailValidation emailValidation = new EmailValidation();
             // Validate the password strength
-            if (!passwordvalidator.IsPasswordStrong(user.Password))
+            if (!passwordvalidator.IsPasswordStrong(userDto.Password))
             {
                 return BadRequest("Password must be at least 8 characters long, and contain an uppercase letter, a lowercase letter, a number, and a special character.");
             }
             // Validate Email
-            if (!emailValidation.IsValidEmail(user.Email))
+            if (!emailValidation.IsValidEmail(userDto.Email))
             {
                 return BadRequest("Not a valid Email address");
             }
-            var newuser = new User
+
+            var users = new User()
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                FirstName = userDto.FirstName,
+                LastName = userDto.LastName,
+                Email = userDto.Email,
                 Password = passwordHasherstring,
-                Email = user.Email,
-                NIN = user.NIN,
-                Gender = user.Gender,
-                PhoneNo = user.PhoneNo,
-                StateofResidence = user.StateofResidence
+                NIN = userDto.NIN,
+                Gender = userDto.Gender,
+                PhoneNo = userDto.PhoneNo,
+                StateofResidence = userDto.StateofResidence
             };
-            _context.Users.Add(newuser);
-            await _context.SaveChangesAsync();
-
-            // Map to DTO
-            return new UserDto
+            _context.Users.Add(users);
+            _context.SaveChanges();
+            var getuser = new GetUserDto
             {
-                
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                NIN = user.NIN,
-                Gender = user.Gender,
-                PhoneNo = user.PhoneNo,
-                StateofResidence = user.StateofResidence
+                UserId = users.UserId,
+                FirstName = users.FirstName,
+                LastName = users.LastName,
+                Email = users.Email,
+                NIN = users.NIN,
+                Gender = users.Gender,
+                PhoneNo = users.PhoneNo,
+                StateofResidence = users.StateofResidence
             };
-        }
 
-       /* [HttpPut("update")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto)
+
+            return Ok(getuser);
+            
+        }
+        // Map to DTO
+          
+
+       
+
+        [HttpPut("update")]
+        public IActionResult UpdateUsers(int userId, UpdateUserDto updateUserDto)
         {
+            var passwordHasherstring = _passwordHasher.Hash(updateUserDto.Password);
             PasswordValidator passwordvalidator = new PasswordValidator();
             EmailValidation emailValidation = new EmailValidation();
-            // Find the user by their email
-            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == updateUserDto.Email);
+            var user = _context.Users.Find(userId);
             if (user == null)
             {
                 return NotFound("User not found.");
             }
-
-            if (!_passwordHasher.verify(updateUserDto.Password, user.Password))
-            {
-                return Unauthorized("Invalid email or password.");
-            }
-
-            //update user fields
             user.FirstName = updateUserDto.FirstName;
             user.LastName = updateUserDto.LastName;
             user.Gender = updateUserDto.Gender;
             user.PhoneNo = updateUserDto.PhoneNo;
+            user.NIN = updateUserDto.NIN;
             user.StateofResidence = updateUserDto.StateofResidence;
-            if (!string.IsNullOrWhiteSpace(updateUserDto.Email) && updateUserDto.Email != user.Email)
+            // Validate the password strength
+            if (!passwordvalidator.IsPasswordStrong(updateUserDto.Password))
             {
-                // Validate the new email format using your custom method
-                if (!emailValidation.IsValidEmail(updateUserDto.Email))
-                {
-                    return BadRequest("Invalid email format.");
-                }
-
-                // Ensure the new email is unique (you might want to check if it already exists in the database)
-                var existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Email == updateUserDto.Email);
-                if (existingUser != null)
-                {
-                    return BadRequest("Email is already in use.");
-                }
-
-                // Update the email
-                user.Email = updateUserDto.Email;
+                return BadRequest("Password must be at least 8 characters long, and contain an uppercase letter, a lowercase letter, a number, and a special character.");
             }
-
-            if (!string.IsNullOrWhiteSpace(updateUserDto.Password))
+            user.Email = updateUserDto.Email;
+            if (!passwordvalidator.IsPasswordStrong(updateUserDto.Password))
             {
-                // Validate the new password using your custom method
-                if (!passwordvalidator.IsPasswordStrong(updateUserDto.Password))
-                {
-                    return BadRequest("New password does not meet the security requirements.");
-                }
-
-                // Hash the new password using your custom hashing method
-                user.Password = _passwordHasher.Hash(updateUserDto.Password);
+                return BadRequest("Password must be at least 8 characters long, and contain an uppercase letter, a lowercase letter, a number, and a special character.");
             }
+            user.Password = passwordHasherstring;
+            var getuser = new GetUserDto
+            {
+                UserId = user.UserId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                NIN = user.NIN,
+                Gender = user.Gender,
+                PhoneNo = user.PhoneNo,
+                StateofResidence = user.StateofResidence
+            };
 
-            // Save the updated user data in the database
-            await _context.SaveChangesAsync();
 
-            return Ok("User data updated successfully.");
+            return Ok(getuser);
         }
-
         [HttpDelete]
-        public IActionResult DeleteUser([FromBody] DeleteUserDto deleteUserDto)
+        public IActionResult DeleteUser(int userId)
         {
-            // Retrieve the user data from the database based on the provided email and password
-            
-            var user = _context.Users.FirstOrDefault(u => u.Email == deleteUserDto.Email);
-            var result = _passwordHasher.verify(user.Password, deleteUserDto.Password);
-
+            var user = _context.Users.Find(userId);
             if (user == null)
             {
                 return NotFound();
             }
-            if (!result)
-            {
-                throw new Exception("Username or Password is not correct");
-            }
-            // Remove the user data from the database
+
             _context.Users.Remove(user);
             _context.SaveChanges();
 
-            return NoContent();
-        }*/
+            return Ok();
+        }
     }
 }

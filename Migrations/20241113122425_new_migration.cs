@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hotel_Reservation_System.Migrations
 {
     /// <inheritdoc />
-    public partial class hotel_reservationDatabase : Migration
+    public partial class new_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,20 +15,20 @@ namespace Hotel_Reservation_System.Migrations
                 name: "User",
                 columns: table => new
                 {
-                    NIN = table.Column<int>(type: "integer", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     Password = table.Column<string>(type: "text", nullable: false),
+                    NIN = table.Column<long>(type: "bigint", nullable: false),
                     Gender = table.Column<string>(type: "text", nullable: true),
-                    PhoneNo = table.Column<int>(type: "integer", nullable: false),
+                    PhoneNo = table.Column<long>(type: "bigint", nullable: false),
                     StateofResidence = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.NIN);
+                    table.PrimaryKey("PK_User", x => x.UserId);
                 });
         }
 
